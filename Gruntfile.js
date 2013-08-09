@@ -280,12 +280,15 @@ module.exports = function (grunt) {
                 }]
             }
         },
-        deploy: {
-            options: {
-                pathModifier: 'dev'
-            },
-            files: 'web/*'
 
+        deploy: {
+            production: {
+                files: 'web/*'
+            },
+
+            qa: {
+                files: 'web/*'
+            }
         },
 
         login: {
@@ -466,5 +469,5 @@ debugger;
     // Default task.
     grunt.registerTask('default', ['copy', 'imagemin:dev', 'templates', 'include', 'less:dev', 'watch']);
     grunt.registerTask('production', ['copy', 'imagemin:production', 'templates', 'concat', 'uglify', 'less:production']);
-    grunt.registerTask('dep', ['login', 'deploy']);
+    grunt.registerTask('deploy-production', ['login', 'deploy:production']);
 };
