@@ -8,7 +8,9 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
+        
         pkg: grunt.file.readJSON('package.json'),
+
         watch: {
             less: {
                 files: ['web/src/styles/**/*.less'],
@@ -277,7 +279,75 @@ module.exports = function (grunt) {
                     dest: 'web/public/img/'
                 }]
             }
+        },
+        deploy: {
+            options: {
+                pathModifier: 'dev'
+            },
+            files: 'web/*'
+
+        },
+
+        login: {
+            options: {
+                user: 'jdp_upload',
+                password: 'upload'
+            },
+
+            files: 'web/*'
         }
+    });
+
+    grunt.registerMultiTask('deploy', 'deploy the sim to a remote host', function () {
+        var shell = require('shelljs');
+        var deploymentOptions = pkg.deployment.production || {};
+        var host = deploymentOptions.server || 'https://forio.com';
+        var client = deploymentOptions.client || pkg.client;
+        var simName = deploymentOptions.url || pkg.name;
+
+        var options = this.options({
+            host: host,
+            path: grunt.template.process('simulate/<%= client %>/<%= simName %>'),
+            fileApi: 'api/files',
+            loginApi: 'api/authenticatio'
+        });
+
+        var post = [options.host, options.path, 'site.zip', '?skip_redirect=true'].join('/');
+        var files = this.data || '*';
+        var dir = /\/\*$/i.test(files) ? files.replace(/\/\*$/i, '') : files;
+
+debugger;
+
+        shell.pushd('.');
+
+        grunt.log.writeln('moving into ' + dir);
+        shell.cd(dir);
+        shell.exec('pwd');
+
+        grunt.log.writeln('compressing site');
+        shell.exec('zip -r site.zip * -x */.DS_Store cookies.txt *-config.json *-config-alt.json uplast package.json README.md Gruntfile.js grunt.js CakeFile file *-sublime-project *-sublime-workspace .gitignore /src/templates/* /src/styles/* /docs/* /node_modules/* /tests/*')
+
+        grunt.log.writeln('uploading to simulate');
+        shell.exec('curl -L -v -c cookies.txt -b cookies.txt -F content=@site.zip -Fmethod=PUT -Funzip=true ' + post);
+
+        grunt.log.writeln('clean up');
+        shell.exec('rm site.zip cookies.txt');
+        shell.popd();
+
+        grunt.log.writeln('deploy!!');
+    });
+
+    grunt.registerMultiTask('login', 'log into simulate', function () {
+        var shell = require('shelljs');
+        var deploymentOptions = pkg.deployment.production || {};
+        var host = deploymentOptions.server || 'https://forio.com';
+
+        var url = [options.host, options.loginApi].join('/');
+        var params = ['user_action=login', 'email=' + options.user, 'password=' + options.password].join('&');
+        var post = [url, '?method=POST&', params].join('');
+
+        grunt.log.writeln(post);
+        shell.exec('curl -L -c -v cookies.txt -b cookies.txt ' + post);
     });
 
     grunt.registerMultiTask('templates', 'Compiles underscore templates', function () {
@@ -396,4 +466,5 @@ module.exports = function (grunt) {
     // Default task.
     grunt.registerTask('default', ['copy', 'imagemin:dev', 'templates', 'include', 'less:dev', 'watch']);
     grunt.registerTask('production', ['copy', 'imagemin:production', 'templates', 'concat', 'uglify', 'less:production']);
+    grunt.registerTask('dep', ['login', 'deploy']);
 };

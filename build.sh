@@ -2,4 +2,4 @@
 
 export PATH="/usr/local/bin:$PATH"
 npm install
-grunt $BUILD-ENVIRONMENT
+grunt production
