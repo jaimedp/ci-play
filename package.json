@@ -7,13 +7,12 @@
 
     "deployment": {
         "production": {
-            "server": "https://forio.com",
-            "url": "delete-me"
+            "host": "https://forio.com"
         },
-
-        "qa": {
-            "server": "https://forio.com",
-            "url": "some-sim-test"
+        
+        "test": {
+            "host": "https://forio.com",
+            "modifier": "-test"
         }
     },
 
