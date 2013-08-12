@@ -9,8 +9,8 @@
         "production": {
             "host": "https://forio.com"
         },
-        
-        "test": {
+
+        "qa": {
             "host": "https://forio.com",
             "modifier": "-test"
         }

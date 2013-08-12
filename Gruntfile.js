@@ -284,11 +284,8 @@ module.exports = function (grunt) {
                 files: 'web/*',
             },
 
-            test: {
+            qa: {
                 files: 'web/*',
-                options: {
-                    host: 'https://xxx.com'
-                }
             }
         },
 
@@ -461,5 +458,5 @@ debugger;
     grunt.registerTask('default', ['copy', 'imagemin:dev', 'templates', 'include', 'less:dev', 'watch']);
     grunt.registerTask('production', ['copy', 'imagemin:production', 'templates', 'concat', 'uglify', 'less:production']);
     grunt.registerTask('deploy-production', ['login', 'deploy:production']);
-    grunt.registerTask('deploy-test', ['login', 'deploy:test']);
+    grunt.registerTask('deploy-qa', ['login', 'deploy:qa']);
 };
